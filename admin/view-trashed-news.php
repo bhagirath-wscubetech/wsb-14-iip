@@ -4,7 +4,14 @@ include "../app/helper.php";
 $msg = "";
 if (isset($_GET['id'])) {
     $newsId = $_GET['id'];
-    $qry = "DELETE FROM news WHERE id = $newsId";
+    $trashed = $_GET['trashed'] ?? "";
+    if ($trashed != "") {
+        //restore
+        $qry = "UPDATE news SET trashed = 0 WHERE id = $newsId";
+    } else {
+        //delete
+        $qry = "DELETE FROM news WHERE id = $newsId";
+    }
     try {
         $flag = mysqli_query($conn, $qry);
     } catch (Exception $err) {
@@ -35,6 +42,7 @@ include "common/header.php";
                         <th>Sr.</th>
                         <th>Title</th>
                         <th width="40%">Description</th>
+                        <th>Status</th>
                         <th>Created At</th>
                         <th>Action</th>
                     </tr>
@@ -63,12 +71,15 @@ include "common/header.php";
                             <td width="40%">
                                 <?php echo $fetch['description'] ?>
                             </td>
+                            <td width="40%">
+                                <?php echo $fetch['status'] == "1" ? "Active" : "Inactive" ?>
+                            </td>
                             <td>
                                 <?php echo $fetch['created_at'] ?>
                             </td>
                             <td>
-                                <a href="add-news.php?id=<?php echo $fetch['id'] ?>">
-                                    <i class="text-primary fa fa-pen"></i>
+                                <a href="view-trashed-news.php?id=<?php echo $fetch['id'] ?>&trashed=1">
+                                    Restore
                                 </a>
                                 &nbsp;
                                 &nbsp;
@@ -93,9 +104,9 @@ include "common/header.php";
 <?php
 if ($msg != "") :
 ?>
-    <script>
+    <!-- <script>
         showSnackbar("<?php echo $msg ?>", <?php echo $flag ?>)
-    </script>
+    </script> -->
 <?php
     $msg = "";
 endif;

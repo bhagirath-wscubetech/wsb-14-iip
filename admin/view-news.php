@@ -6,16 +6,18 @@ $id = $_GET['id'] ?? "";
 
 if ($id != "") {
     $status = $_GET['status'] ?? ""; // null safe operator
-    if($status != ""){
+    if ($status != "") {
         // update
         $qry = "UPDATE news SET status = $status WHERE id = $id";
-    }else{
+    } else {
         // delete
-        $qry = "DELETE FROM news WHERE id = $id";
+        // $qry = "DELETE FROM news WHERE id = $id";
+        $qry = "UPDATE news SET trashed = 1 WHERE id = $id";
+
     }
     // echo $qry;
     try {
-        $success = mysqli_query($conn,$qry);
+        $success = mysqli_query($conn, $qry);
     } catch (Exception $err) {
         $success = false;
     }
@@ -50,7 +52,7 @@ include "common/header.php";
                     // *  all cols
                     // select title from news;
                     // select title,description from news
-                    $sel = "SELECT * FROM news";
+                    $sel = "SELECT * FROM news WHERE trashed = 0 ORDER BY id DESC";
                     $exe = mysqli_query($conn, $sel);
                     $sr = 1;
                     while ($fetch = mysqli_fetch_assoc($exe)) {
@@ -84,7 +86,9 @@ include "common/header.php";
                                     <span class="fa fa-trash text-danger"></span>
                                 </a>
                                 &nbsp;&nbsp;
-                                <span class="fa fa-pen text-primary"></span>
+                                <a href="add-news.php?id=<?php echo $fetch['id']?>">
+                                    <span class="fa fa-pen text-primary"></span>
+                                </a>
                             </td>
                         </tr>
                     <?php

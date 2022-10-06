@@ -45,11 +45,13 @@
                     </div>
                     <ul class="news-list">
                         <?php
-                        $selNews = "SELECT title FROM news WHERE status = 1";
+                        $selNews = "SELECT title,id FROM news WHERE status = 1 AND trashed = 0 ORDER BY id DESC";
                         $exeNews = mysqli_query($conn, $selNews);
                         while ($fetchNews = mysqli_fetch_assoc($exeNews)) :
                         ?>
-                            <li><img src="images/dot.jpg"><?php echo $fetchNews['title'] ?> </li>
+                            <a href="read-news.php?id=<?php echo $fetchNews['id'] ?>">
+                                <li><img src="images/dot.jpg"><?php echo $fetchNews['title'] ?> </li>
+                            </a>
                         <?php
                         endwhile;
                         ?>

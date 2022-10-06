@@ -2,24 +2,33 @@
 include "../app/config.php";
 include "../app/helper.php";
 
-// for ($i = 1; $i <= 50; $i++) {
-//     $title = "Title$i";
-//     $desc =  "Description$i";
-//     $qry = "INSERT INTO news SET title = '$title', description = '$desc'";
-//     mysqli_query($conn, $qry);
-// }
+$mode = "Add";
+$id = $_GET['id'] ?? "";
 
-// die;
+if ($id != "") {
+    $mode = "Update";
+    $sel = "SELECT * FROM news WHERE id = $id";
+    $exe = mysqli_query($conn, $sel);
+    $data = mysqli_fetch_assoc($exe);
+    // p($data);
+}
+
 if (isset($_POST['save'])) {
     $title = $_POST['news_title'];
     $desc = $_POST['news_desc'];
     if ($title != ""  && $desc != "") {
         // sever side validation
-        $qry = "INSERT INTO news SET title = '$title', description = '$desc'";
+        if ($id != "") {
+            // update query
+            $qry = "UPDATE news SET title = '$title', description = '$desc' WHERE id = $id";
+        } else {
+            $qry = "INSERT INTO news SET title = '$title', description = '$desc'";
+            // insert query
+        }
         try {
             $success = mysqli_query($conn, $qry);
         } catch (Exception $err) {
-            // echo $err->getMessage();
+            echo $err->getMessage();
             $success = false;
         }
         if ($success == true) {
@@ -41,22 +50,23 @@ include "common/header.php";
     <!-- Page Heading -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Add News</h6>
+            <h6 class="m-0 font-weight-bold text-primary"><?php echo $mode ?> News</h6>
         </div>
         <div class="card-body">
             <form method="post">
                 <div class="row">
                     <div class="col-12">
                         <label for="" class="form-lable">Title</label>
-                        <input type="text" required name="news_title" class="form-control">
+                        <input type="text" value="<?php echo $data['title'] ?>" required name="news_title" class="form-control">
                     </div>
                     <div class="col-12 mt-2">
                         <label for="" class="form-lable">Description</label>
-                        <textarea name="news_desc" required class="form-control" cols="30" rows="10"></textarea>
+                        <textarea name="news_desc" required class="form-control" cols="30" rows="10"><?php echo $data['description'] ?></textarea>
                     </div>
+                    <?php echo $mode ?>
                     <div class="col-12 mt-2">
                         <button class="btn btn-primary" type="submit" name="save" value="clicked">
-                            Add
+                            <?php echo $mode ?>
                         </button>
                         <button class="btn btn-warning" type="reset">Reset</button>
                     </div>
